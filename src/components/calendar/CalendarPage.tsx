@@ -58,7 +58,7 @@ const { data: activities = initialActivities } =
       startDate,
       endDate,
     });
-
+	  const date = variables.date;
 			utils.calendar.getActivities.setData({ startDate, endDate }, (old) => {
   if (!old) return old;
 
