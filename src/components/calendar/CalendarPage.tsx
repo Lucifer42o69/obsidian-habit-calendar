@@ -1,4 +1,4 @@
-import { skipToken } from "@trpc/react-query";
+import { skipToken } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { MultiOptionCalendar } from "./MultiOptionCalendar";
 import { api } from "~/utils/api";
