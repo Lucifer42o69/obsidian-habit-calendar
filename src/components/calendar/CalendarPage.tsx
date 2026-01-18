@@ -49,12 +49,15 @@ const { data: activities = initialActivities } =
 
 	const utils = api.useContext();
 	const toggleMutation = api.calendar.toggleActivity.useMutation({
-		onMutate: async (variables) => {
-			await utils.calendar.getActivities.cancel({ startDate, endDate });
-			const previousData = utils.calendar.getActivities.getData({
-				startDate,
-				endDate,
-			});
+  onMutate: async () => {
+    if (!startDate || !endDate) return;
+
+    await utils.calendar.getActivities.cancel({ startDate, endDate });
+
+    const previousData = utils.calendar.getActivities.getData({
+      startDate,
+      endDate,
+    });
 
 			utils.calendar.getActivities.setData({ startDate, endDate }, (old) => {
 				if (!old) return old;
