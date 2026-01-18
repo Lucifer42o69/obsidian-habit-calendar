@@ -1,3 +1,4 @@
+import { skipToken } from "@trpc/react-query";
 import { useState, useMemo } from "react";
 import { MultiOptionCalendar } from "./MultiOptionCalendar";
 import { api } from "~/utils/api";
@@ -38,11 +39,13 @@ export default function CalendarPage({ initialActivities }: CalendarPageProps) {
 		year: "numeric",
 	});
 
-	const { data: activities = initialActivities } =
-		api.calendar.getActivities.useQuery(
-			{ startDate, endDate },
-			{ initialData: initialActivities },
-		);
+const { data: activities = initialActivities } =
+  api.calendar.getActivities.useQuery(
+    startDate && endDate
+      ? { startDate, endDate }
+      : skipToken,
+    { initialData: initialActivities }
+  );
 
 	const utils = api.useContext();
 	const toggleMutation = api.calendar.toggleActivity.useMutation({
