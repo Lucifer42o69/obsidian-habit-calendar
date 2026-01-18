@@ -49,46 +49,51 @@ const { data: activities = initialActivities } =
 
 	const utils = api.useContext();
 	const toggleMutation = api.calendar.toggleActivity.useMutation({
-  onMutate: async () => {
+  onMutate: async (variables) => {
     if (!startDate || !endDate) return;
-
-    await utils.calendar.getActivities.cancel({ startDate, endDate });
+    await utils.calendar.getActivities.cancel({
+      startDate,
+      endDate,
+    });
 
     const previousData = utils.calendar.getActivities.getData({
       startDate,
       endDate,
     });
-	  const date = variables.date;
+
+    utils.calendar.getActivities.setData(
+      { startDate, endDate },
+      (old) => {
+        if (!old) return old;
+
+        const exists = old.some(
+          (activity) => activity.date === date,
+        );
+
+        if (exists) {
+          return old.filter(
+            (activity) => activity.date !== date,
+          );
+        }
+
+        return [...old, { date }];
+      },
+    );
+
+    return { previousData };
+  },
+});
 			utils.calendar.getActivities.setData({ startDate, endDate }, (old) => {
   if (!old) return old;
 
   const exists = old.some(
-    (activity) => activity.date === variables.date,
   );
 
   if (exists) {
     return old.filter(
-      (activity) => activity.date !== variables.date,
     );
   }
-
-  return [...old, { date: variables.date }];
-});
-			return { previousData };
-		},
-		onError: (error, variables, context) => {
-			if (context?.previousData) {
-				utils.calendar.getActivities.setData(
-					{ startDate, endDate },
-					context.previousData,
-				);
-			}
-			toast.error("Failed to update activity", { position: "top-left" });
-		},
-		onSettled: () => {
-			utils.calendar.getActivities.invalidate({ startDate, endDate });
-		},
-	});
+	
 
 	const activityMaps = useMemo(() => {
 		const maps: Record<string, Record<string, boolean>> = {};
