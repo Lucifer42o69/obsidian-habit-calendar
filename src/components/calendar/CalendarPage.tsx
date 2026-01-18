@@ -60,28 +60,20 @@ const { data: activities = initialActivities } =
     });
 
 			utils.calendar.getActivities.setData({ startDate, endDate }, (old) => {
-				if (!old) return old;
+  if (!old) return old;
 
-				const existingIndex = old.findIndex(
-					(item: any) => item.date === variables.date,
-				);
-				if (existingIndex !== -1) {
-					const newData = [...old];
-					newData[existingIndex] = {
-						...newData[existingIndex],
-						[variables.activity]:
-							newData[existingIndex][variables.activity] === 1 ? 0 : 1,
-					};
-					return newData;
-				} else {
-					const newActivity: Record<string, string | number> = {
-						date: variables.date,
-						[variables.activity]: 1,
-					};
-					return [...old, newActivity];
-				}
-			});
+  const exists = old.some(
+    (activity) => activity.date === variables.date,
+  );
 
+  if (exists) {
+    return old.filter(
+      (activity) => activity.date !== variables.date,
+    );
+  }
+
+  return [...old, { date: variables.date }];
+});
 			return { previousData };
 		},
 		onError: (error, variables, context) => {
